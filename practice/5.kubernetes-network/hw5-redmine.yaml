@@ -1,0 +1,44 @@
+---
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: redmine-deployment
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: my-redmine
+      strategy:
+        type: RollingUpdate
+        rollingUpdate:
+          maxSurge: 1
+          maxUnavailable: 0
+      template:
+        metadata:
+          labels:
+            app: my-redmine
+        spec:
+          containers:
+          - image: redmine:4.1.1
+            name: hw5-redmine
+            env:
+            - name: REDMINE_DB_POSTGRES
+              value: database
+            - name: REDMINE_DB_USERNAME
+              value: pguser                 
+            - name: REDMINE_DB_PASSWORD
+              value: test
+              #valueFrom:
+              #  secretKeyRef:
+              #    name: postgres-secret
+              #    key: POSTGRES_PASSWORD
+            - name: REDMINE_DB_DATABASE 
+              value: pgdb            
+            - name: REDMINE_SECRET_KEY_BASE
+              valueFrom:
+                secretKeyRef:
+                  name: redmine-secret
+                  key: REDMINE_PASSWORD                         
+            ports:
+            - containerPort: 3000
+              protocol: TCP

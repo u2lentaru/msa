@@ -1,0 +1,35 @@
+---
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: postgres-deployment
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: my-postgres
+      strategy:
+        type: Recreate
+      template:
+        metadata:
+          labels:
+            app: my-postgres
+        spec:
+          containers:
+          - image: postgres:10.13
+            name: hw4-postgres
+            env:
+            - name: POSTGRES_USER
+              value: pguser                 
+            - name: POSTGRES_DB 
+              value: pgdb
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_PASSWORD
+            - name: PGDATA  
+              value: /var/lib/postgresql/data/pgdata                             
+            ports:
+            - containerPort: 5432
+              protocol: TCP
